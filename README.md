@@ -3,7 +3,7 @@ Kepler's law of orbits verification program written in Python
 
 # Introduction
 
-This is based on the lab experiment found [here][https://faculty.uca.edu/njaustin/PHYS1401/Laboratory/kepler.html#:~:text=Kepler%20was%20able%20to%20determine,its%20orbit%20every%20687%20days.].
+This is based on the lab experiment found [here](https://faculty.uca.edu/njaustin/PHYS1401/Laboratory/kepler.html#:~:text=Kepler%20was%20able%20to%20determine,its%20orbit%20every%20687%20days.).
 
 # Libraries Used
 
@@ -13,3 +13,4 @@ This is based on the lab experiment found [here][https://faculty.uca.edu/njausti
 * LsqEllipse for fitting ellipse
 
 # Screenshots
+![fig1](https://github.com/dheerajshenoy/Keplers-law-orbit-experiment-python/assets/21986384/acd06f63-3ba3-49f9-b512-721a8023ffae)
