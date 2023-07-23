@@ -52,7 +52,7 @@ class Kepler:
         theta = np.linspace(0, 2 * np.pi, 1000)
         x = self.r * np.cos(theta)
         y = self.r * np.sin(theta)
-        self.ax.plot(x, y, color='y')
+        self.ax.plot(x, y, color='y', label = 'Earth\'s Orbit')
 
     def circle_intersection(self, line : LineSegment) -> List[float]:
         """
@@ -67,11 +67,11 @@ class Kepler:
             Function returns l2 line
         """
         l1 = LineSegment(ang1, 0, 0, 2)
-        l1.draw(self.ax, color='gray', alpha = 0.5)
+        l1.draw(self.ax, color='gray', alpha = 0.2)
         ix, iy = self.circle_intersection(l1)
         plt.plot(ix, iy, '.', color='gray')
         l2 = LineSegment(ang2, ix, iy, 2)
-        l2.draw(self.ax, color='gray', alpha = 0.5)
+        l2.draw(self.ax, color='gray', alpha = 0.2)
         return l2
 
     def proc(self, csv_filename):
@@ -114,12 +114,9 @@ class Kepler:
 
         ellipse = Ellipse(
             xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
-            edgecolor='b', fc='None', lw=2, label='Fit', zorder=2
+            edgecolor='b', fc='None', lw=2, label='Mar\'s Orbit', zorder=2
         )
         self.ax.add_patch(ellipse)
-
-        plt.xlabel('$X_1$')
-        plt.ylabel('$X_2$')
 
         plt.legend()
         plt.show()
