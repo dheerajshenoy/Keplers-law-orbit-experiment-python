@@ -162,6 +162,7 @@ class Kepler:
     def change_earth_orbit_color(self, color):
         self.color_earth_orbit = color
         self.earthorbit[0].set_color(color)
+        self.ax.legend()
         self.fig.canvas.draw()
 
     def change_intersection_point_color(self, color):
@@ -189,6 +190,7 @@ class Kepler:
             self.planetOrbit.set_edgecolor(color)
         except AttributeError:
             pass
+        self.ax.legend()
         self.fig.canvas.draw()
 
     def change_line_from_earth_color(self, color):
@@ -213,6 +215,7 @@ class Kepler:
         value = value / 100
         self.alpha_earth_orbit = value
         self.earthorbit[0].set_alpha(value)
+        self.ax.legend()
         self.fig.canvas.draw()
 
     def change_planet_orbit_alpha(self, value):
@@ -220,6 +223,7 @@ class Kepler:
         self.alpha_planet_orbit = value
         try:
             self.planetOrbit.set_alpha(value)
+            self.ax.legend()
             self.fig.canvas.draw()
         except AttributeError:
             pass
@@ -548,6 +552,8 @@ class SideBar(QWidget):
         self.cbx_line_from_sun.setEnabled(True)
         self.cbx_intersection_point.setEnabled(True)
         self.cbx_earth_orbit_intersection_point.setEnabled(True)
+        if self.b_legend:
+            self.kepler.ax.legend()
         self.updatecanvas()
 
     def toggle_grid(self, value):
