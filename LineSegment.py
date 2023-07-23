@@ -25,8 +25,8 @@ class LineSegment:
         self.y = self.y0 + self.length * np.sin(self.angle)
     
     def draw(self, ax, **kwargs):
-        ax.plot([self.x0, self.x], [self.y0, self.y], **kwargs)
-
+        return ax.plot([self.x0, self.x], [self.y0, self.y], **kwargs)
+        
     def intersect(self, other : 'LineSegment'):
         x1,y1 = other.x0, other.y0
         x2,y2 = other.x, other.y
