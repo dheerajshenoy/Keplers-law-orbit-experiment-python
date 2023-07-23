@@ -1,3 +1,18 @@
+#!/usr/bin/env python3
+"""
+    The program is based on a lab experiment from the link in the README.md. The procedure is simple:
+    There are two data given, Heliocentric Longitude of Earth (HL) and Geocentric Longitude of Mars (GL).
+    Both these data are in degrees. We first draw a circle of a radius depicting the Earth's orbit.
+    Then we mark the center of this circle as the sun. Next, we find the intersection of the line that
+    makes an angle (HL) from the sun and move to this intersecting point. We draw a line making an angle
+    GL from this point. We go to the next data and repeat the same procedure. We find that these two lines
+    having angles (GL1, GL2) intersect at a point. We repeat this procedure for the remaining data.
+    Next, we find the best fit of an ellipse through these set of intersecting points. This gives the
+    orbit of Mars(in this case).
+
+    Code By: V DHEERAJ SHENOY
+"""
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Circle, Ellipse
@@ -6,20 +21,23 @@ import pandas as pd
 from LineSegment import LineSegment
 from ellipse import LsqEllipse
 
-
 class Kepler:
     def __init__(self):
-        self.r = 1
+        self.r = 1 # radius of earth's orbit
         self.Init()
 
         # Store intersecting points (for fitting ellispe later)
         self.ixs = []
         self.iys = []
 
-        self.proc()
-        self.fit()
+        self.proc("data.csv") # read data from the csv file and mark the intersecting points
+        self.fit() # Best fit an ellipse through these intersecting points
+
 
     def Init(self):
+        """
+            Initialising function that draws the sun at the center, draws Earth's orbit
+        """
         self.fig, self.ax = plt.subplots()
         self.ax.set_xlim(-2, 2)
         self.ax.set_ylim(-2, 2)
@@ -33,14 +51,21 @@ class Kepler:
         # Draw Earth's orbit
         theta = np.linspace(0, 2 * np.pi, 1000)
         x = self.r * np.cos(theta)
-        self.earthY = self.r * np.sin(theta)
-        self.ax.plot(x, self.earthY, 'gray')
+        y = self.r * np.sin(theta)
+        self.ax.plot(x, y, color='y')
 
     def circle_intersection(self, line : LineSegment) -> List[float]:
+        """
+            Function that returns the coordinates (x, y) of the point of intersection of the HL line with the Earth's orbit
+        """
         return [self.r * np.cos(line.angle), self.r * np.sin(line.angle)]
 
-
     def point(self, ang1, ang2) -> LineSegment:
+        """
+            l1 is the line drawn from the sun { center (0, 0) }.
+            l2 is the line drawn from the point of intersection of the l1 line with the Earth's orbit
+            Function returns l2 line
+        """
         l1 = LineSegment(ang1, 0, 0, 2)
         l1.draw(self.ax, color='gray', alpha = 0.5)
         ix, iy = self.circle_intersection(l1)
@@ -49,14 +74,20 @@ class Kepler:
         l2.draw(self.ax, color='gray', alpha = 0.5)
         return l2
 
-    def proc(self):
-        df = pd.read_csv("data.csv")
+    def proc(self, csv_filename):
+        """
+            Reads the csv data from `csv_filename` file and reads the angles and runs the procedure
+            of plotting the lines and intersecting points of these lines and stores all these
+            intersecting points.
+        """
+        df = pd.read_csv(csv_filename)
 
         for index, row in df.iterrows():
             ang1s = np.array(df["HL Earth"])
             ang2s = np.array(df["GL Mars"])
         
         for i in range(len(ang1s)-1):
+            # We need two set of angles to find the intersection of the lines
             ang1 = ang1s[i]
             ang2 = ang2s[i]
             ang3 = ang1s[i + 1]

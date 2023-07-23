@@ -1,8 +1,20 @@
+"""
+    Class for represting a line segment
+    Code By: V DHEERAJ SHENOY
+"""
+
 import matplotlib.pyplot as plt
 from typing import List
 import numpy as np
 
 class LineSegment:
+    """
+        Takes the following argument:
+            angle - in degrees
+            x0 - starting x point
+            y0 - starting y point
+            length - length of the line segment
+    """
     def __init__(self, angle, x0 = 0, y0 = 0, length = 1):
         angle %= 360
         self.angle = np.radians(angle)
