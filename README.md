@@ -13,4 +13,4 @@ This is based on the lab experiment found [here](https://faculty.uca.edu/njausti
 * LsqEllipse for fitting ellipse
 
 # Screenshots
-![fig1](Screenshots/fig1.png)
+![fig1](Screenshots/fig.png)
