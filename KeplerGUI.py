@@ -272,10 +272,11 @@ class ColorBar(QWidget):
 
         color = QColor(self.color)
         print(color.lightness())
-        if color.lightness() >= 20 and color.lightness() <= 255:
-            self.btn.setStyleSheet("color: {}; background-color: {}".format(color.lighter().name(), self.color))
-        elif color.lightness() < 20:
-            self.btn.setStyleSheet("color: {}; background-color: {}".format(color.darker().name(), self.color))
+        self.btn.setStyleSheet("background-color: {}".format(self.color))
+        # if color.lightness() >= 20 and color.lightness() <= 255:
+        #     self.btn.setStyleSheet("color: {}; background-color: {}".format(color.lighter().name(), self.color))
+        # elif color.lightness() < 20:
+        #     self.btn.setStyleSheet("color: {}; background-color: {}".format(color.darker().name(), self.color))
 
     def color(self):
         return self.color
