@@ -13,4 +13,4 @@ This is based on the lab experiment found [here](https://faculty.uca.edu/njausti
 * LsqEllipse for fitting ellipse
 
 # Screenshots
-![fig1](https://github.com/dheerajshenoy/Keplers-law-orbit-experiment-python/assets/21986384/acd06f63-3ba3-49f9-b512-721a8023ffae)
+![fig1](Screenshots/fig1.png)
