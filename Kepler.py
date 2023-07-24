@@ -33,7 +33,6 @@ class Kepler:
         self.proc("data.csv") # read data from the csv file and mark the intersecting points
         self.fit() # Best fit an ellipse through these intersecting points
 
-
     def Init(self):
         """
             Initialising function that draws the sun at the center, draws Earth's orbit
@@ -104,8 +103,16 @@ class Kepler:
         x = np.array(self.ixs)
         y = np.array(self.iys)
         X = np.array(list(zip(x, y)))
+        print(X)
         reg = LsqEllipse().fit(X)
         center, width, height, phi = reg.as_parameters()
+
+        b = width / 2
+        a = height / 2
+
+        c = np.sqrt(a**2 - b**2)
+        print(c/a)
+
 
         print(f'center: {center[0]:.3f}, {center[1]:.3f}')
         print(f'width: {width:.3f}')
@@ -117,7 +124,7 @@ class Kepler:
             edgecolor='b', fc='None', lw=2, label='Mar\'s Orbit', zorder=2
         )
         self.ax.add_patch(ellipse)
-
+        
         plt.legend()
         plt.show()
 
