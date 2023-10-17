@@ -119,7 +119,6 @@ class FitEllipse:
         phi = phi % np.pi
 
         return x0, y0, ap, bp, e, phi
-
     
     @staticmethod
     def get_ellipse_pts(params, npts=100, tmin=0, tmax=2*np.pi):
@@ -160,6 +159,7 @@ class Kepler:
         self.l2s = []
         self.lineCircleIntersectionList = []
         self.intersectionList = []
+        self.planetOrbit = None
 
         # Store intersecting points (for fitting ellispe later)
         self.ixs = []
@@ -183,12 +183,8 @@ class Kepler:
         self.ax.set_ylim(-2, 2)
         self.ax.set_aspect('equal')
 
-        # Draw Sun
-        self.sun = Circle(xy=(0, 0), radius = 0.1, color=self.color_sun)
-        self.ax.add_artist(self.sun)
 
         # Draw Earth's orbit
-        self.earth_orbit()
 
     def earth_orbit(self):
         theta = np.linspace(0, 2 * np.pi, 1000)
@@ -196,7 +192,9 @@ class Kepler:
         y = self.r * np.sin(theta)
         self.earthorbit = self.ax.plot(x, y, color=self.color_earth_orbit,
                                        label = 'Earth\'s Orbit', alpha = self.alpha_earth_orbit)
-        type(self.earthorbit)
+        # Draw Sun
+        self.sun = Circle(xy=(0, 0), radius = 0.1, color=self.color_sun)
+        self.ax.add_artist(self.sun)
 
     def circle_intersection(self, line : LineSegment) -> List[float]:
         # Function that returns the coordinates (x, y) of the point of intersection of the HL line with the Earth's orbit
@@ -247,23 +245,19 @@ class Kepler:
                 self.ixs.append(ipt[0])
                 self.iys.append(ipt[1])
 
-    def fit(self):
-        x = np.array(self.ixs)
-        y = np.array(self.iys)
-        X = np.array(list(zip(x, y)))
-        reg = LsqEllipse().fit(X)
-        center, width, height, phi = reg.as_parameters()
-
-        # print(f'center: {center[0]:.3f}, {center[1]:.3f}')
-        # print(f'width: {width:.3f}')
-        # print(f'height: {height:.3f}')
-        # print(f'phi: {phi:.3f}')
-        #
-        self.planetOrbit = Ellipse(
-                xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
-                edgecolor=self.color_planet_orbit, fc='None', lw=2, label='Mar\'s Orbit', zorder=2,
-                alpha = self.alpha_planet_orbit)
-        self.ax.add_patch(self.planetOrbit)
+    # LspEllipse fitting
+    # def fit(self):
+    #     x = np.array(self.ixs)
+    #     y = np.array(self.iys)
+    #     X = np.array(list(zip(x, y)))
+    #     reg = LsqEllipse().fit(X)
+    #     center, width, height, phi = reg.as_parameters()
+    #
+    #     self.planetOrbit = Ellipse(
+    #             xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
+    #             edgecolor=self.color_planet_orbit, fc='None', lw=2, label='Mar\'s Orbit', zorder=2,
+    #             alpha = self.alpha_planet_orbit)
+    #     self.ax.add_patch(self.planetOrbit)
 
     def fit2(self):
         x = np.array(self.ixs)
@@ -274,7 +268,7 @@ class Kepler:
         x0, y0, ap, bp, e, phi = FitEllipse.cart_to_pol(coeffs)
 
         x, y = FitEllipse.get_ellipse_pts((x0, y0, ap, bp, e, phi))
-        self.ax.plot(x, y)
+        self.planetOrbit = self.ax.plot(x, y)
 
         self.ax.set_title("Eccentricity = {}".format(e))
 
@@ -668,15 +662,29 @@ class SideBar(QWidget):
         self.cbx_axis.setChecked(self.b_axis)
         self.toggle_axis(self.b_axis)
 
+
+    def removePointsFromList(self, ListOfObject):
+        if ListOfObject is not None and len(ListOfObject) > 0:
+            for i in ListOfObject:
+                j = i.pop(0)
+                j.remove()
+
+    def removeObject(self, obj):
+        if obj is not None:
+            obj[0].remove()
+
     def data_file_func(self):
         filepath = QFileDialog().getOpenFileName(self, "Open File", "~", "CSV Files (*.csv)")
         data_file = filepath[0]
         self.file_browse_button.setText(data_file.split("/")[-1])
+        self.kepler.ax.clear()
+        self.kepler.earth_orbit()
         self.kepler.DataFile(data_file)
         self.cbx_planet_orbit.setEnabled(True)
         self.cbx_line_from_sun.setEnabled(True)
         self.cbx_intersection_point.setEnabled(True)
         self.cbx_earth_orbit_intersection_point.setEnabled(True)
+
         if self.b_legend:
             self.kepler.ax.legend()
         self.updatecanvas()
