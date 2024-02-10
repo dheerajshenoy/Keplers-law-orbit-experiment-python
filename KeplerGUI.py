@@ -22,9 +22,10 @@ import pandas as pd
 from LineSegment import LineSegment
 #from ellipse import LsqEllipse
 import sys
+from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import (QCheckBox, QComboBox, QFileDialog, QGridLayout,
-                             QGroupBox, QMenuBar, QPushButton, QLineEdit,
-                             QColorDialog, QLabel, QSizePolicy, QSlider,
+                             QGroupBox, QMenuBar, QPushButton, QMessageBox,
+                             QColorDialog, QLabel, QSlider, QScrollArea,
                              QSplitter, QMainWindow, QApplication, QWidget,
                              QVBoxLayout, QHBoxLayout)
 from PyQt6.QtCore import Qt
@@ -139,7 +140,7 @@ class Kepler:
         self.fig = fig
         self.ax = ax
         self.color_sun = 'y'
-        self.color_earth_orbit = 'k'
+        self.color_earth_orbit = 'yellow'
         self.shape_line_circle_intersection = 'o'
         self.shape_intersection_point = 'o'
         self.color_line_circle_intersection = 'gray'
@@ -245,20 +246,6 @@ class Kepler:
                 self.ixs.append(ipt[0])
                 self.iys.append(ipt[1])
 
-    # LspEllipse fitting
-    # def fit(self):
-    #     x = np.array(self.ixs)
-    #     y = np.array(self.iys)
-    #     X = np.array(list(zip(x, y)))
-    #     reg = LsqEllipse().fit(X)
-    #     center, width, height, phi = reg.as_parameters()
-    #
-    #     self.planetOrbit = Ellipse(
-    #             xy=center, width=2*width, height=2*height, angle=np.rad2deg(phi),
-    #             edgecolor=self.color_planet_orbit, fc='None', lw=2, label='Mar\'s Orbit', zorder=2,
-    #             alpha = self.alpha_planet_orbit)
-    #     self.ax.add_patch(self.planetOrbit)
-
     def fit2(self):
         x = np.array(self.ixs)
         y = np.array(self.iys)
@@ -271,12 +258,6 @@ class Kepler:
         self.planetOrbit = self.ax.plot(x, y)
 
         self.ax.set_title("Eccentricity = {}".format(e))
-
-        # self.planetOrbit = Ellipse(
-        #         xy=(x0, y0), width=2*bp, height=2*ap, angle=np.rad2deg(phi),
-        #         edgecolor=self.color_planet_orbit, fc='None', lw=2, label='Mar\'s Orbit', zorder=2,
-        #         alpha = self.alpha_planet_orbit)
-        # self.ax.add_patch(self.planetOrbit)
 
     def change_earth_orbit_color(self, color):
         self.color_earth_orbit = color
@@ -711,7 +692,9 @@ class SideBar(QWidget):
 
     def toggle_planet_orbit(self, value):
         self.b_planet_orbit = value
-        self.kepler.planetOrbit.set_visible(value)
+
+        for i in self.kepler.planetOrbit:
+            i.set_visible(value)
         self.updatecanvas()
 
     def toggle_earth_orbit_intersection_point(self, value):
@@ -788,6 +771,7 @@ class SideBar(QWidget):
 class MainApplication(QMainWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.setWindowTitle("Kepler Orbit")
         self.fig, self.ax = plt.subplots()
         self.kepler = Kepler(self.fig, self.ax)
         self.InitGUI(self.kepler)
@@ -796,6 +780,7 @@ class MainApplication(QMainWindow):
     def InitGUI(self, kepler : Kepler):
         self.canvas = FigureCanvas(self.fig)
         self.toolbar = NavigationToolbar(self.canvas, self)
+        self.toolbar.setMinimumHeight(40)
         self.mainWidget = QWidget()
         self.mainLayout = QVBoxLayout()
 
@@ -804,8 +789,10 @@ class MainApplication(QMainWindow):
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.setCentralWidget(self.mainWidget)
         self.mainWidget.setLayout(self.mainLayout)
-
+    
+        self.scrollarea = QScrollArea(self)
         self.sideBar = SideBar(self, kepler)
+        self.scrollarea.setWidget(self.sideBar)
         self.canvasWidget = QWidget()
         self.canvasWidgetLayout = QVBoxLayout()
         self.canvasWidget.setLayout(self.canvasWidgetLayout)
@@ -813,10 +800,13 @@ class MainApplication(QMainWindow):
         self.canvasWidgetLayout.addWidget(self.canvas)
 
         self.splitSection = QSplitter(Qt.Orientation.Horizontal)
+        self.scrollarea.setFixedWidth(450)
+        self.scrollarea.setMaximumWidth(450)
 
         self.splitSection.setStyleSheet('QSplitter::handle { width: 1px; background: gray; }')
+
         self.splitSection.setContentsMargins(0, 0, 0, 0)
-        self.splitSection.addWidget(self.sideBar)
+        self.splitSection.addWidget(self.scrollarea)
         self.splitSection.addWidget(self.canvasWidget)
         self.mainLayout.setContentsMargins(0, 0, 0, 0)
         self.mainLayout.addWidget(self.menubar)
@@ -824,9 +814,19 @@ class MainApplication(QMainWindow):
 
     def InitMenubar(self):
         self.menubar = QMenuBar()
+        self.menubar.setMaximumHeight(25)
+        self.helpMenu = QAction("Help")
+        self.helpMenu.triggered.connect(self.show_about)
         self.menubar.addMenu("File")
-        self.menubar.addMenu("Help")
-        self.menubar.addMenu("Exit")
+        self.menubar.addAction(self.helpMenu)
+
+    def show_about(self):
+        msg = QMessageBox(self)
+        # msg.setStyleSheet(msgbox_stylesheet)
+        msg.setIcon(QMessageBox.Icon.Information)
+        msg.setText("Determination of orbit of planet around sun\nProgram written in Python.\n\nBy: V DHEERAJ SHENOY")
+        msg.show()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
